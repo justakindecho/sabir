@@ -17,7 +17,89 @@ body {
     overflow-x: hidden;
     cursor: default;
 }
+/* PASSWORD PAGE STYLES */
+#passwordPage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f9c5bd 0%, #d9c2f0 50%, #ffd6e0 100%);
+    position: relative;
+    overflow: hidden;
+}
 
+.password-container {
+    background: rgba(255, 250, 245, 0.95);
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    animation: fadeInScale 1s ease-out;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.password-container h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.5em;
+    color: #d9c2f0;
+    margin-bottom: 20px;
+}
+
+.password-container p {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.1em;
+    color: #0e1a2b;
+    margin-bottom: 30px;
+}
+
+.lock-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+}
+
+.password-input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 1.1em;
+    border: 2px solid #d9c2f0;
+    border-radius: 50px;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.password-input:focus {
+    border-color: #ffd6e0;
+    box-shadow: 0 0 20px rgba(217, 194, 240, 0.5);
+}
+
+.password-error {
+    color: #ff6b6b;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9em;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.password-error.show {
+    opacity: 1;
+}
+
+.mainContent {
+    display: none;
+}
+
+.mainContent.unlocked {
+    display: block;
+}
 .page {
     min-height: 100vh;
     display: flex;
@@ -866,7 +948,29 @@ body {
     .countdown-
     </style>
 </head>
-<body>
+  <!-- PASSWORD PAGE -->
+<div id="passwordPage">
+    <div class="floating-hearts"></div>
+    <div class="sparkles"></div>
+    <div class="password-container">
+        <div class="lock-icon">🔒</div>
+        <h1>This Gift is Protected</h1>
+        <p>Enter the password to unlock your special surprise 💝</p>
+        <input 
+            type="password" 
+            class="password-input" 
+            id="passwordInput" 
+            placeholder="Enter password..."
+            autofocus
+        >
+        <div class="password-error" id="passwordError">Incorrect password! Try again 💔</div>
+        <button class="btn" onclick="checkPassword()">Unlock 🔓</button>
+        <p class="password-hint">Hint: Your special name 💖</p>
+    </div>
+</div>
+
+<!-- MAIN CONTENT (wrapped) -->
+<div class="mainContent" id="mainContent">
     <div id="page1" class="page">
         <div class="floating-hearts"></div>
         <div class="sparkles"></div>
@@ -1018,6 +1122,72 @@ body {
     </div>
 
     <script>
+      
+const correctPassword = "natyashikhar"; 
+
+function checkPassword() {
+    const input = document.getElementById('passwordInput').value.toLowerCase().trim();
+    const error = document.getElementById('passwordError');
+    
+    if (input === correctPassword) {
+        // Correct password - unlock
+        document.getElementById('passwordPage').style.display = 'none';
+        document.getElementById('mainContent').classList.add('unlocked');
+        
+        // Initialize first page
+        const heartsContainer = document.querySelector('#page1 .floating-hearts');
+        const sparklesContainer = document.querySelector('#page1 .sparkles');
+        createFloatingHearts(heartsContainer);
+        createSparkles(sparklesContainer);
+        
+        // Celebration effect
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * window.innerHeight;
+                createPopConfetti(x, y);
+            }, i * 20);
+        }
+    } else {
+        // Wrong password
+        error.classList.add('show');
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').style.animation = 'shake 0.5s';
+        setTimeout(() => {
+            document.getElementById('passwordInput').style.animation = '';
+            error.classList.remove('show');
+        }, 2000);
+    }
+}
+
+// Allow Enter key to submit password
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('passwordInput');
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+        
+        // Initialize password page animations
+        const heartsContainer = document.querySelector('#passwordPage .floating-hearts');
+        const sparklesContainer = document.querySelector('#passwordPage .sparkles');
+        if (heartsContainer) createFloatingHearts(heartsContainer);
+        if (sparklesContainer) createSparkles(sparklesContainer);
+    }
+});
+
+// Add shake animation for wrong password
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+`;
+document.head.appendChild(style);
 document.addEventListener('mousemove', (e) => {
     if (Math.random() > 0.85) {
         const sparkle = document.createElement('div');
@@ -1473,12 +1643,6 @@ function createFireworkAtPosition(x, y) {
     }
 }
 
-window.addEventListener('load', () => {
-    const heartsContainer = document.querySelector('#page1 .floating-hearts');
-    const sparklesContainer = document.querySelector('#page1 .sparkles');
-    createFloatingHearts(heartsContainer);
-    createSparkles(sparklesContainer);
-});
 
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('btn')) {
